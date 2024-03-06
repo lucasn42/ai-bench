@@ -1,4 +1,5 @@
 import time
+import json
 
 import torch
 import torch.nn as nn
@@ -14,16 +15,22 @@ from torch.utils.data import DataLoader
 
 from accelerate import Accelerator
 
+from fvcore.nn import FlopCountAnalysis
+
 import argparse
 import os
 
 parser = argparse.ArgumentParser(description='cifar10 classification models, single gpu performance test')
 parser.add_argument('--lr', default=0.1, help='')
-parser.add_argument('--batch_size', type=int, default=512, help='')
+parser.add_argument('--batch_size', type=int, default=4096, help='')
 parser.add_argument('--num_workers', type=int, default=0, help='')
-
+parser.add_argument('--max_epochs', type=int, default=100, help='')
 
 def main():
+
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True)
+    torch.manual_seed(42)
 
     args = parser.parse_args()
 
@@ -42,31 +49,66 @@ def main():
 
     net, optimizer, train_loader = accelerator.prepare(net,optimizer,train_loader)
 
+    # Pre-load data in GPU memory to get higher usage:
+
+    batches = [(batch_idx,(inputs.cuda(),targets.cuda())) for batch_idx, (inputs, targets) in enumerate(train_loader)]
+
     perf = []
+
+    perf_time = []
 
     total_start = time.time()
 
-    for batch_idx, (inputs, targets) in enumerate(train_loader):
+    for epoch in range(0,args.max_epochs):
 
-       start = time.time()
+       running_loss = 0
+
+       for batch_idx, (inputs, targets) in batches:
+
+          start = time.time()
        
-       inputs = inputs
-       targets = targets
+          inputs = inputs
+          targets = targets
 
-       outputs = net(inputs)
-       loss = criterion(outputs, targets)
+          outputs = net(inputs)
+          loss = criterion(outputs, targets)
 
-       optimizer.zero_grad()
-       accelerator.backward(loss)
-       optimizer.step()
+          optimizer.zero_grad()
+          accelerator.backward(loss)
+          optimizer.step()
 
-       batch_time = time.time() - start
+          torch.cuda.synchronize()
+          batch_time = time.time() - start
 
-       images_per_sec = args.batch_size/batch_time
+          batch_perf = args.batch_size/batch_time
 
-       perf.append(images_per_sec)
+          perf.append(batch_perf)
+          perf_time.append(batch_time)
+
+
+       accelerator.wait_for_everyone()
 
     total_time = time.time() - total_start
+
+    # Convert to torch.Tensor to compute mean across all processes using Accelerator.reduce()
+    images_per_sec = torch.Tensor(perf).cuda()
+    all_batch_times = torch.Tensor(perf_time).cuda()
+
+    avg_batch_time = all_batch_times.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(all_batch_times, reduction="mean").mean().item()
+    images_per_sec = images_per_sec.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(images_per_sec, reduction="mean").mean().item()
+
+        
+    if accelerator.is_main_process:
+      
+      total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
+
+      report = {"train_run_time": total_time, "train_samples_per_second": images_per_sec,"train_steps_per_second": (((batch_idx+1) * args.max_epochs) / total_time), "avg_flops": total_flos/avg_batch_time, "train_loss": loss.item()}
+
+      print(report)
+
+      #with open("./report.json", "w") as file:
+         
+      #   json.dump(report, file)
 
 if __name__=='__main__':
    main()
