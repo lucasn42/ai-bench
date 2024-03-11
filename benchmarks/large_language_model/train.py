@@ -50,7 +50,7 @@ with open("./llama_model.config", "r") as file:
 
 dataset = load_dataset("HuggingFaceH4/ultrachat_200k", split="train_gen")
 
-tokenizer = LlamaTokenizerFast.from_pretrained("kykim0/Llama-2-7b-ultrachat200k-2e")
+tokenizer = LlamaTokenizerFast.from_pretrained("hf-internal-testing/llama-tokenizer")
 
 tokenizer.pad_token = tokenizer.eos_token
 
