@@ -12,12 +12,10 @@ esac
 
 echo "Installing benchmark python dependencies..."
 
-if [ $GPU_ENVIRONMENT -eq "Nvidia" ] then;
-
+if [ $GPU_ENVIRONMENT == "Nvidia" ]; then
     pip install -r requirements_cuda.txt
 
 else
-  
     pip install -r requirements_rocm.txt
 
 fi
@@ -35,4 +33,7 @@ export TRANSFORMERS_CACHE=./hf_cache
 echo "Downloading benchmark artifacts..."
 
 python get_data_and_models.py
+
+echo "Done downloading artifacts."
+echo "Please execute run.sh to launch the benchmark."
 

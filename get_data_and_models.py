@@ -1,20 +1,17 @@
 
 def get_cifar10(datadir):
 
-   import torchvision.transforms as transforms
    from torchvision.datasets import CIFAR10
 
-   transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-   dataset = CIFAR10(root=datadir, train=True, download=False, transform=transform_train)
+   dataset = CIFAR10(root=datadir, train=True, download=True)
 
 
 
-def get_hf_dataset(dataset_name_and_config, split):
+def get_hf_dataset(dataset_name_and_config, **kwargs):
 
    from datasets import load_dataset
 
-   dataset = load_dataset(*dataset_name_and_config, split)
+   dataset = load_dataset(*dataset_name_and_config, **kwargs)
 
 
 def get_hf_model(model_name):
@@ -38,7 +35,7 @@ def main():
    get_cifar10("./benchmarks/image_classification/data")
 
    print("Downloading data for language model benchmark...")
-   get_hf_dataset(("glue","cola"), split="train")
+   get_hf_dataset(("glue","cola"))
 
    print("Downloading data for large language model benchmark...")
    get_hf_dataset(("HuggingFaceH4/ultrachat_200k",), split="train_gen")
