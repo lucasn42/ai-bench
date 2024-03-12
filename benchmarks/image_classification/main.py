@@ -1,3 +1,7 @@
+import sys
+sys.path.append("../../reporting/") # Will make the whole bench into a package eventually, but for now...
+from reporting_utils import init_report, save_report
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -24,6 +28,12 @@ parser.add_argument('--batch_size', type=int, default=4096, help='')
 parser.add_argument('--num_workers', type=int, default=0, help='')
 parser.add_argument('--max_epochs', type=int, default=100, help='')
 
+accelerator = Accelerator()
+
+report = init_report()
+
+report["num_gpus"] = accelerator.num_processes
+
 def main():
 
     torch.backends.cudnn.benchmark = False
@@ -31,8 +41,6 @@ def main():
     torch.manual_seed(42)
 
     args = parser.parse_args()
-
-    accelerator = Accelerator()
 
     net = resnet152() # Load model on the GPU
 
@@ -93,25 +101,32 @@ def main():
     avg_batch_time = all_batch_times.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(all_batch_times, reduction="mean").mean().item()
     images_per_sec = images_per_sec.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(images_per_sec, reduction="mean").mean().item()
 
-        
     if accelerator.is_main_process:
-      
-      total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
-      num_gpus = accelerator.num_processes
 
-      report = {"train_run_time": total_time, "num_gpus": num_gpus, "train_samples_per_second": images_per_sec,"train_steps_per_second": (((batch_idx+1) * args.max_epochs) / total_time), "avg_flops": total_flos / avg_batch_time, "train_loss": loss.item()}
+       total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
 
-      print(report)
+       report["train_run_time"] = total_time
+       report["train_samples_per_second"] = images_per_sec
+       report["train_steps_per_second"] = (((batch_idx+1) * args.max_epochs) / total_time)
+       report["avg_flops"] = total_flos / avg_batch_time
+       report["train_loss"] = loss.item()
+       report["status"] = "PASS"
 
-      return report
+       print(report)
 
-      
+       return report
+
 if __name__=='__main__':
+
    try:
       report  = main()
 
    except:
+      
+      if accelerator.is_main_process:
+         print("Benchmark FAILED. Skipping...")
       report["status"]="FAIL"
+   
+   if accelerator.is_main_process:
+      save_report(report)
 
-   with open("./report.json", "w") as file:
-      json.dump(report, file)
