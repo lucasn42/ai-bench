@@ -1,3 +1,7 @@
+import sys
+sys.path.append("../../reporting/") # Will make the whole bench into a package eventually, but for now...
+from reporting_utils import init_report, save_report
+
 import torch
 import torch.optim as optim
 
@@ -13,15 +17,20 @@ from accelerate import Accelerator
 from fvcore.nn import FlopCountAnalysis
 
 import argparse
-import os
 import time
 import json
 
 parser = argparse.ArgumentParser(description='U-Net image segmentation gpu performance test')
 parser.add_argument('--lr', default=0.0001, help='')
-parser.add_argument('--batch_size', type=int, default=16, help='')
+parser.add_argument('--batch_size', type=int, default=8, help='')
 parser.add_argument('--num_workers', type=int, default=0, help='')
 parser.add_argument('--max_epochs', type=int, default=100, help='')
+
+accelerator = Accelerator()
+
+report = init_report()
+
+report["num_gpus"] = accelerator.num_processes
 
 def main():
 
@@ -30,8 +39,6 @@ def main():
     torch.manual_seed(42)
 
     args = parser.parse_args()
-
-    accelerator = Accelerator()
 
     net = Unet3D(1, 3, normalization="instancenorm", activation="relu")
 
@@ -94,16 +101,25 @@ def main():
     if accelerator.is_main_process:
 
        total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
-       num_gpus = accelerator.num_processes
 
-       report = {"train_run_time": total_time, "num_gpus": num_gpus, "train_samples_per_second": images_per_sec,"train_steps_per_second": (((batch_idx+1) * args.max_epochs) / total_time), "avg_flops": total_flos / avg_batch_time, "train_loss": loss.item()}
+       report["train_run_time"] = total_time 
+       report["train_samples_per_second"] = images_per_sec
+       report["train_steps_per_second"] = (((batch_idx+1) * args.max_epochs) / total_time)
+       report["avg_flops"] = total_flos / avg_batch_time 
+       report["train_loss"] = loss.item()
+       report["status"] = "PASS"
 
        print(report)
 
-       with open("./report.json", "w") as file:
-
-          json.dump(report, file)
-
+       return report
 
 if __name__=='__main__':
-   main()
+
+   try:
+      report  = main()
+
+   except:
+      print("Benchmark FAILED. Skipping...")
+      report["status"]="FAIL"
+   
+   save_report(report)

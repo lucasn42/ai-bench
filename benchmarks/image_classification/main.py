@@ -103,9 +103,15 @@ def main():
 
       print(report)
 
-      with open("./report.json", "w") as file:
+      return report
 
-         json.dump(report, file)
       
 if __name__=='__main__':
-   main()
+   try:
+      report  = main()
+
+   except:
+      report["status"]="FAIL"
+
+   with open("./report.json", "w") as file:
+      json.dump(report, file)
