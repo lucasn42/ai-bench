@@ -95,7 +95,7 @@ def main():
        report["train_run_time"] = training_history["train_runtime"]
        report["train_samples_per_second"] = training_history["train_samples_per_second"]
        report["train_steps_per_second"] = training_history["train_steps_per_second"]
-       report["avg_flops"] = training_history["total_flos"] / (8 / training_history["train_samples_per_second"])
+       report["avg_flops"] = training_history["total_flos"] / (8/training_history["train_samples_per_second"])
        report["train_loss"] = training_history["train_loss"]
        report["status"] = "PASS"
 
@@ -109,4 +109,10 @@ if __name__=='__main__':
       report  = main()
 
    except:
-      print("Benchmark FAILED. Skipping...")
+      if accelerator.is_main_process:
+         print("Benchmark FAILED. Skipping...")
+      report["status"]="FAIL"
+
+   if accelerator.is_main_process:
+      save_report(report)
+
