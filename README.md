@@ -25,15 +25,15 @@ Once ```prepare.sh``` finishes running, you can execute ```run.sh```. This scrip
 
 The following issues might come up when you run this benchmark:
 
-### 1. '''rocm-smi''' or '''amd-smi''' is showing 100% usage of my AMD GPU, but the benchmark doesn't seem to be running at all.
+### 1. ```rocm-smi``` or ```amd-smi''' is showing 100% usage of my AMD GPU, but the benchmark doesn't seem to be running at all.
 
-- Make sure the environment variable '''MIOPEN_USER_DB_PATH''' points to a location where the current user can write. The default is '''$HOME/.config/miopen''', which should be ok.
+- Make sure the environment variable ```MIOPEN_USER_DB_PATH``` points to a location where the current user can write. The default is ```$HOME/.config/miopen```, which should be ok.
 
-- Make sure you can read/write at '''$HOME/.cache'''. If you can't, set the environment variable '''MIOPEN_DISABLE_CACHE=1'''
+- Make sure you can read/write at ```$HOME/.cache```. If you can't, set the environment variable ```MIOPEN_DISABLE_CACHE=1```
 
 - If you are asking yourself "Why wouldn't I be able to read/write in my own $HOME", the last two points are not for you. But also do check in case you're trying to run this inside a container.
 
-- If using multiple GPUs and they are **not configured** in a topology that allows direct GPU-to-GPU communication, set '''NCCL_P2P_DISABLE=1'''.
+- If using multiple GPUs and they are **not configured** in a topology that allows direct GPU-to-GPU communication, set ```NCCL_P2P_DISABLE=1```.
 
 ### 2. The Large Language Model benchmark keeps failing, why?
 
