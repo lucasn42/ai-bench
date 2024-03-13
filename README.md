@@ -25,7 +25,7 @@ Once ```prepare.sh``` finishes running, you can execute ```run.sh```. This scrip
 
 The following issues might come up when you run this benchmark:
 
-### 1. ```rocm-smi``` or ```amd-smi''' is showing 100% usage of my AMD GPU, but the benchmark doesn't seem to be running at all.
+### 1. ```rocm-smi``` or ```amd-smi``` is showing 100% usage of my AMD GPU, but the benchmark doesn't seem to be running at all.
 
 - Make sure the environment variable ```MIOPEN_USER_DB_PATH``` points to a location where the current user can write. The default is ```$HOME/.config/miopen```, which should be ok.
 
