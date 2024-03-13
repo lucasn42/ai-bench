@@ -88,11 +88,9 @@ def main():
 
    accelerator.wait_for_everyone()
 
-   training_history = trainer.state.log_history
+   training_history = trainer.state.log_history[-1]
 
    if accelerator.is_main_process:
-
-       total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
 
        report["train_run_time"] = training_history["train_runtime"]
        report["train_samples_per_second"] = training_history["train_samples_per_second"]

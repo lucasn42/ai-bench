@@ -119,7 +119,11 @@ if __name__=='__main__':
       report  = main()
 
    except:
-      print("Benchmark FAILED. Skipping...")
+
+      if accelerator.is_main_process:
+         print("Benchmark FAILED. Skipping...")
       report["status"]="FAIL"
-   
-   save_report(report)
+
+   if accelerator.is_main_process:
+      save_report(report)
+

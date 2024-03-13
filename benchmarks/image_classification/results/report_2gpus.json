@@ -1,0 +1,1 @@
+{"num_gpus": 2, "train_run_time": 245.04254698753357, "train_samples_per_second": 11767.1171875, "train_steps_per_second": 2.856646768512458, "avg_flops": 5600728132874.489, "train_loss": 0.00016868730017449707, "status": "PASS"}
