@@ -42,6 +42,5 @@ cd $BASE_DIR
 
 echo "Collecting results and generating final performance report..."
 
-# add call to reporting script
-
+python $BASE_DIR/reporting/make_final_report.py
 

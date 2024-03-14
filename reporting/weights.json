@@ -1,0 +1,72 @@
+{
+   "benchmarks": [
+      {
+         "benchmark": "image_classification",
+         "weights": [
+            {
+               "num_gpus": 1,
+               "weight": 1
+            },
+            {
+               "num_gpus": 2,
+               "weight": 0
+            },
+            {
+               "num_gpus": 3,
+               "weight": 0
+            }
+         ]
+      },
+      {
+         "benchmark": "image_segmentation",
+         "weights": [
+            {
+               "num_gpus": 1,
+               "weight": 0
+            },
+            {
+               "num_gpus": 2,
+               "weight": 0
+            },
+            {
+               "num_gpus": 3,
+               "weight": 0
+            }
+         ]
+      },
+      {
+         "benchmark": "language_model",
+         "weights": [
+            {
+               "num_gpus": 1,
+               "weight": 0
+            },
+            {
+               "num_gpus": 2,
+               "weight": 0
+            },
+            {
+               "num_gpus": 3,
+               "weight": 0
+            }
+         ]
+      },
+      {
+         "benchmark": "large_language_model",
+         "weights": [
+            {
+               "num_gpus": 1,
+               "weight": 0
+            },
+            {
+               "num_gpus": 2,
+               "weight": 0
+            },
+            {
+               "num_gpus": 3,
+               "weight": 0
+            }
+         ]
+      }
+   ]
+}
