@@ -1,5 +1,6 @@
 #!/bin/bash
 
+SETUP_DIR=$PWD/setup
 
 read -p "What GPU environment will be used to run this benchmark suite? [Nvidia/AMD] " GPU_ENVIRONMENT;
 
@@ -13,10 +14,10 @@ esac
 echo "Installing benchmark python dependencies..."
 
 if [ $GPU_ENVIRONMENT == "Nvidia" ]; then
-    pip install -r requirements_cuda.txt
+    pip install -r $SETUP_DIR/requirements_cuda.txt
 
 else
-    pip install -r requirements_rocm.txt
+    pip install -r $SETUP_DIR/requirements_rocm.txt
 
 fi
 
@@ -32,7 +33,7 @@ export TRANSFORMERS_CACHE=./hf_cache
 
 echo "Downloading benchmark artifacts..."
 
-python get_data_and_models.py
+python $SETUP_DIR/get_data_and_models.py
 
 echo "Done downloading artifacts."
 echo "Please execute run.sh to launch the benchmark."
