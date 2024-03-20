@@ -18,24 +18,20 @@ def load_json(report_file):
 
     return results
 
-#weights = TBD
 
 bench_data = [[benchmark, load_json(f"./benchmarks/{benchmark}/results/{results_file}")] for benchmark in os.listdir("./benchmarks") for results_file in os.listdir(f"./benchmarks/{benchmark}/results/")]
 
 index, results = zip(*bench_data)
 
 results_df = pd.DataFrame(results, index=pd.Index(index,name='Benchmark'))
-
 results_df.reset_index(inplace=True)
 
 weights_data = load_json("./reporting/weights.json")
-
 weights_data = [[benchmark["benchmark"],weight] for benchmark in weights_data["benchmarks"] for weight in benchmark["weights"]]
 
 index, weights = zip(*weights_data)
 
 weights_df = pd.DataFrame(weights, index=pd.Index(index, name='Benchmark'))
-
 weights_df.reset_index(inplace=True)
 
 report_df = pd.merge(results_df,weights_df, on=['Benchmark','num_gpus'], how='left').dropna()
