@@ -79,8 +79,7 @@ def main():
         learning_rate=2.5e-5, # Want a small lr for finetuning
         optim="adamw_torch",
         logging_dir="./logs",        # Directory for storing logs
-        do_eval=True,
-        remove_unused_columns=False, # Perform evaluation at the end of training
+        remove_unused_columns=False,
      ),
    )
    

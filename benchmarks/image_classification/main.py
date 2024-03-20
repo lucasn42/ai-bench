@@ -99,14 +99,14 @@ def main():
     all_batch_times = torch.Tensor(perf_time).cuda()
 
     avg_batch_time = all_batch_times.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(all_batch_times, reduction="mean").mean().item()
-    images_per_sec = images_per_sec.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(images_per_sec, reduction="mean").mean().item()
+    images_per_sec = images_per_sec.mean().item() if accelerator.distributed_type=='NO' else accelerator.reduce(images_per_sec, reduction="sum").mean().item()
 
     if accelerator.is_main_process:
 
        total_flos = FlopCountAnalysis(net, inputs).total() * accelerator.num_processes
 
        report["train_run_time"] = total_time
-       report["train_samples_per_second"] = images_per_sec * accelerator.num_processes
+       report["train_samples_per_second"] = images_per_sec
        report["train_steps_per_second"] = (((batch_idx+1) * args.max_epochs) / total_time) * accelerator.num_processes
        report["avg_flops"] = total_flos / avg_batch_time
        report["train_loss"] = loss.item()
