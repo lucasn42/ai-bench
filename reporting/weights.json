@@ -14,7 +14,11 @@
             {
                "num_gpus": 3,
                "weight": 0
-            }
+            },
+	    {
+	       "num_gpus": 4,
+               "weight": 0
+	    }
          ]
       },
       {
@@ -30,6 +34,10 @@
             },
             {
                "num_gpus": 3,
+               "weight": 0
+            },
+	        {
+               "num_gpus": 4,
                "weight": 0
             }
          ]
@@ -48,6 +56,10 @@
             {
                "num_gpus": 3,
                "weight": 0
+            },
+	    {
+               "num_gpus": 4,
+               "weight": 0
             }
          ]
       },
@@ -64,6 +76,10 @@
             },
             {
                "num_gpus": 3,
+               "weight": 0
+            },
+	    {
+               "num_gpus": 4,
                "weight": 0
             }
          ]
