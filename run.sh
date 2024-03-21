@@ -21,7 +21,15 @@ run_bench(){
        cd $BASE_DIR/benchmarks/$1
        echo "Running $1 benchmark with $n_proc device(s)..."
 
-       accelerate launch --mixed_precision=fp16 --num_machines=1 --num_processes=$n_proc  main.py
+       if [ $1=="large_language_model" ]; then
+
+          accelerate launch --mixed_precision=fp16 --num_machines=1 --num_processes=$n_proc --config_file="../configs/fsdp_llama.py"  main.py
+
+       else
+
+          accelerate launch --mixed_precision=fp16 --num_machines=1 --num_processes=$n_proc  main.py
+
+       fi
        
    done
 }

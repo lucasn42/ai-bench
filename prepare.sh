@@ -1,5 +1,6 @@
 #!/bin/bash
 
+BASE_DIR=$PWD
 SETUP_DIR=$PWD/setup
 
 read -p "What GPU environment will be used to run this benchmark suite? [Nvidia/AMD] " GPU_ENVIRONMENT;
@@ -25,11 +26,11 @@ wait
 
 echo "Switching Huggingface Cache to local directory..."
 
-mkdir ./hf_cache
+mkdir $BASE_DIR/hf_cache
 
-export HF_HOME=./hf_cache
-export HF_DATASETS_CACHE=./hf_cache
-export TRANSFORMERS_CACHE=./hf_cache
+export HF_HOME=$BASE_DIR/hf_cache
+export HF_DATASETS_CACHE=$BASE_DIR/hf_cache
+export TRANSFORMERS_CACHE=$BASE_DIR/hf_cache
 
 echo "Downloading benchmark artifacts..."
 
