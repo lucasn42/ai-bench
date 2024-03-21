@@ -23,7 +23,7 @@ run_bench(){
 
        if [ "$1" == "large_language_model" ]; then
 
-          accelerate launch --mixed_precision=fp16 --num_machines=1 --num_processes=$n_proc --config_file="${BASE_DIR}/configs/fsdp_llama.py"  main.py
+          accelerate launch --mixed_precision=fp16 --num_machines=1 --num_processes=$n_proc --config_file="${BASE_DIR}/configs/fsdp_llama.yaml"  main.py
 
        else
 
