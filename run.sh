@@ -11,8 +11,7 @@ export TRANSFORMERS_OFFLINE=1
 
 export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
-# Setting this here for testing. Remove later.
-N_GPUS=4
+read -p "How many GPUs will be used to run this benchmark?" N_GPUS;
 
 run_bench(){
 
