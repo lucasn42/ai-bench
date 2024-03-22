@@ -11,12 +11,11 @@ export TRANSFORMERS_OFFLINE=1
 
 export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
-
 MAIN_NODE=$1
 MAIN_PORT=$2
 N_NODES=$3
 N_GPUS=$4
-
+MACHINE_RANK=$5
 
 run_bench_parallel(){
 
@@ -27,15 +26,14 @@ run_bench_parallel(){
 
        if [ "$1" == "large_language_model" ]; then
 
-          accelerate launch --mixed_precision=fp16 --num_machines=${N_NODES} --num_processes=${N_PROCS} --main_process_ip=${MAIN_NODE} --main_process_port=${MAIN_PORT} --config_file="${BASE_DIR}/configs/fsdp_llama.yaml"  main.py
+          accelerate launch --mixed_precision=fp16 --num_machines=${N_NODES} --num_processes=${N_PROCS} --main_process_ip=${MAIN_NODE} --main_process_port=${MAIN_PORT} --machine_rank=${MACHINE_RANK} --config_file="${BASE_DIR}/configs/fsdp_llama.yaml"  main.py
 
        else
 
-          accelerate launch --mixed_precision=fp16 --num_machines=${N_NODES} --num_processes=${N_PROCS} --main_process_ip=${MAIN_NODE} --main_process_port=${MAIN_PORT} main.py
+          accelerate launch --mixed_precision=fp16 --num_machines=${N_NODES} --num_processes=${N_PROCS} --main_process_ip=${MAIN_NODE} --main_process_port=${MAIN_PORT} --machine_rank=${MACHINE_RANK} main.py
 
        fi
-       
-   done
+
 }
 
 
@@ -46,7 +44,7 @@ BENCHMARKS=`ls $BASE_DIR/benchmarks`
 for bench in $BENCHMARKS
 do
 
-   run_bench $bench
+   run_bench_parallel $bench
 
 done
 
